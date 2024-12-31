@@ -1,0 +1,180 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot plt
+%matplotlib inline
+
+df = pd.read_csv('Reviews.csv')
+
+df.head()
+
+df.shape
+
+df.info()
+
+df.Summary.head()
+
+df.Text.head()
+
+## Text preprocessing - removing stop words, converting capital letters to lower case , punctuation
+
+! pip install txetblob
+
+from nltk.corpus import stopwords
+from textblob import TextBlob
+from textblob import Word
+
+## converting into lowercase and removing punctuations
+
+
+df['Text'] = df['Text'].apply(lambda x: " " .join(x.lower() for x in x.split()))
+
+df['Text'] = df['Text'].str.replace('[^\w\s]',"")
+df.Text.head(5)
+
+## string.replace(old,new,count)
+
+string = " this is food is classic"
+
+print(string.replace("classic","nice")
+
+## Removal of stop words
+stop = stopwords.words('english')
+## removing stop word and joining
+df['Text'] = df['Text'].apply(lambda x: " " .join(x for x in x.split() if x not in stop))
+df.Text.head()
+
+##spelling correcion take more time
+
+df['Text'] = df['Text'].apply(lambda x: str(TextBlob(x).correct()))
+df.Text.head(5)
+
+## Lemmatization
+
+df['Text'] = df['Text'].apply(lambda x: " ".join([Word(word).lemmatize() for word in x.split()]))
+df.Text.head()
+
+## word cloud - visual representation of the frequent and prominant words in dataset
+
+! pip install wordcloud
+
+from wordcloud import WordCloud
+from wordcloud import STOPWORDS
+
+df.columns
+
+## finding scores
+df.Score.value_counts()
+
+## plotting the counts
+
+sns.countplot(data =df, x = 'Score')
+
+
+## performing exploratory analysis
+
+cloud = df
+
+## dropping null values
+
+cloud.dropna(inplace=True)
+
+## store the review scores in an object
+
+scr1 = cloud[cloud['Score'] == 1]
+scr2 = cloud[cloud['Score'] == 2]
+scr3 = cloud[cloud['Score'] == 3]
+scr4 = cloud[cloud['Score'] == 4]
+scr5 = cloud[cloud['Score'] == 5]
+
+
+## concatenating all the scoure from the dataset
+
+all_scr = pd.concat([scr1,scr2,scr3,scr4,scr5],axis=0)
+all_scr.reset_index(drop=True,inplace=True)
+
+## creating word cloud - it will take single sting as a input
+
+cloud_str = all_scr.Summary.str.cat()
+wordcloud = WordCloud(background_color = 'white').generate(cloud_str)
+plt.figure(figsize=(10,10))
+plt.imshow(wordcloud,interpolation='bilinear')
+plt.axis("off")
+plt.show()
+
+## split the negative reviews with the scrore 1 to 2 and positive score is 4 to 5
+
+neg = rev_sam[rev_sam['Score']isin[1,2])]
+pos = rev_sam[rev_sam['Score']isin[4,5])]
+
+## converting to one string
+
+neg_one = neg.Summary.str.cat()
+pos_one = pos.Summary.str.cat()
+
+
+## create wordcloud
+
+neg_cloud = WordCloud(background_color='White').generate(neg_one)
+pos_cloud = WordCloud(background_color='black').gener.setate(pos_one)
+
+
+## plotting -ve wordcloud
+
+fig = plt.figure(figsize=(10,10))
+axs1 = fig.add_subplot(211)
+axs1.imshow(neg_cloud,interpolation='bilinear')
+axs1.axis("off")
+axs1.set_title('negative reviews',fontsize=10)
+
+## plotting +ve wordcloud
+
+fig = plt.figure(figsize=(10,10))
+axs2 = fig.add_subplot(211)
+axs2.imshow(pos_cloud,interpolation='bilinear')
+axs2.axis("off")
+axs2.set_title('Positive reviews',fontsize=10)
+
+## vader sentiment - Aalence Aware Dictionary and sentiment Reasoner range from -1 to +1
+
+!pip install vaderSentiment
+
+import seaborn as sns
+import re
+import os
+import sys
+import ast
+plt.style.use('538')
+
+## getting sentiment analyser
+
+se=sns.color_palette()
+from vaderSentimet.vaderSentiment import SentimentIntensityAnalyzer
+analyse = SentimentIntensityAnalyzer()
+
+## generating sentiment for all the sentence in the ds
+
+all_sent=[]
+for row in df['Text']:
+
+vs = analyse.polarity_score(row)
+all_sent.append(vs)
+
+## creating dataframe with sentiments
+
+sen_df = pd.DataFrame(all_sent)
+sen_df.head()
+
+## adding sentiment data frame with the original dataset
+
+old_df = pd.concat([df.reset_index(drop=True),sen_df],axis=1)
+old_df.head(3)
+
+## converting scores into positive,negative sentiments using threshold value_counts
+
+old_df['Sentiment_value'] = np.where(old_df['compound'] >= 0 , 'Positive','Negative')
+old_df.head(10)
+
+## Graph for finding postive and negative results
+
+grph = old_df['Sentiment_value'].value_counts()
+result.plot(kind='bar' ,rot=0,color=['plum','cyan']);
