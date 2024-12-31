@@ -3,7 +3,8 @@ import pandas as pd
 import matplotlib.pyplot plt
 %matplotlib inline
 
-df = pd.read_csv('Reviews.csv')
+##df = pd.read_csv('Reviews.csv')
+df = pd.read_excel(r"C:\Users\susee\Reviews.xlsx")
 
 df.head()
 
